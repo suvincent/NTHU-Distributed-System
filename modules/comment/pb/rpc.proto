@@ -14,7 +14,7 @@ service Comment {
 		};
 	}
 	
-	// TODO: Complete the following RPC service with correct parameter, return type and gateway option.
+	// gRPC TODO: Complete the following RPC service with correct parameter, return type and gateway option.
 	rpc ListComment() returns () {}
 
 	rpc CreateComment() returns () {}

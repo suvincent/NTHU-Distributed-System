@@ -20,7 +20,7 @@ message CommentInfo {
 	google.protobuf.Timestamp updated_at = 5;
 }
 
-// TODO: Define following message schemas.
+// gRPC TODO: Define following message schemas.
 message CreateCommentRequest {}
 
 message CreateCommentResponse {}
