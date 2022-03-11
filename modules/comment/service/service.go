@@ -35,6 +35,18 @@ gRPC TODO:
 3. Pack the array into correct format.
 */
 func (s *service) ListComment(ctx context.Context, req *pb.ListCommentRequest) (*pb.ListCommentResponse, error) {
+	// ListByVideoID(ctx context.Context, videoID string, limit, offset int) ([]*Comment, error)
+	// dao.Comment
+	comments, err := s.commentDAO.ListByVideoID(ctx, req.GetVideoId(), int(req.GetLimit()), int(req.GetOffset()))
+	if err != nil {
+		return nil, err
+	}
+	CommentInfos := []*pb.CommentInfo{}
+	for _, comment := range comments {
+		c := comment.ToProto()
+		CommentInfos = append(CommentInfos,c)
+	}
+	return &pb.ListCommentResponse{Comments: CommentInfos}, nil
 }
 
 /*
@@ -46,6 +58,23 @@ gRPC TODO:
 4. Return the result. You may use .String() method to transform the return value of dao API to a string.
 */
 func (s *service) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
+	// GetVideo(ctx context.Context, in *GetVideoRequest, opts ...grpc.CallOption) (*GetVideoResponse, error)
+	vreq := &videopb.GetVideoRequest{Id:req.VideoId}
+	_, err := s.videoClient.GetVideo(ctx, vreq)
+	if err != nil {
+		return nil, err
+	}
+	creq := &dao.Comment{
+		VideoID: req.VideoId,
+		Content: req.GetContent(),
+	}
+	// creq := dao.NewFakeComment(data.Video.GetId())
+	// Create(ctx context.Context, comment *Comment) (uuid.UUID, error)
+	result, err := s.commentDAO.Create(ctx, creq)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.CreateCommentResponse{Id: result.String()}, nil
 }
 
 /*
@@ -58,8 +87,15 @@ gRPC TODO:
 func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentRequest) (*pb.UpdateCommentResponse, error) {
 	commentID, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, ErrInvalidUUID
+		return nil, err
 	}
+	// Update(ctx context.Context, comment *Comment) error
+	comment := dao.Comment {ID:commentID, Content:req.GetContent()}
+	err = s.commentDAO.Update(ctx, &comment)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UpdateCommentResponse{Comment: comment.ToProto()},nil
 }
 
 /*
@@ -70,8 +106,14 @@ gRPC TODO:
 func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.DeleteCommentResponse, error) {
 	commentID, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, ErrInvalidUUID
+		return nil, err
 	}
+	// Delete(ctx context.Context, id uuid.UUID) error
+	err = s.commentDAO.Delete(ctx, commentID)
+	if err != nil {
+		return nil ,err
+	}
+	return &pb.DeleteCommentResponse{} ,nil
 }
 
 /*
@@ -80,4 +122,10 @@ gRPC TODO:
 2. Return the response.
 */
 func (s *service) DeleteCommentByVideoID(ctx context.Context, req *pb.DeleteCommentByVideoIDRequest) (*pb.DeleteCommentByVideoIDResponse, error) {
+	// DeleteByVideoID(ctx context.Context, videoID string) error
+	err := s.commentDAO.DeleteByVideoID(ctx, req.GetVideoId())
+	if err != nil {
+		return nil ,err
+	}
+	return &pb.DeleteCommentByVideoIDResponse{}, nil
 }

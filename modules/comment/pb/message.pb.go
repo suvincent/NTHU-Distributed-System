@@ -185,6 +185,7 @@ func (x *CommentInfo) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// gRPC TODO: Define following message schemas.
 type CreateCommentRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
