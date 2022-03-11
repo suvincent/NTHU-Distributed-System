@@ -44,7 +44,7 @@ func (s *service) ListComment(ctx context.Context, req *pb.ListCommentRequest) (
 	CommentInfos := []*pb.CommentInfo{}
 	for _, comment := range comments {
 		c := comment.ToProto()
-		CommentInfos = append(CommentInfos,c)
+		CommentInfos = append(CommentInfos, c)
 	}
 	return &pb.ListCommentResponse{Comments: CommentInfos}, nil
 }
@@ -59,7 +59,7 @@ gRPC TODO:
 */
 func (s *service) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CreateCommentResponse, error) {
 	// GetVideo(ctx context.Context, in *GetVideoRequest, opts ...grpc.CallOption) (*GetVideoResponse, error)
-	vreq := &videopb.GetVideoRequest{Id:req.VideoId}
+	vreq := &videopb.GetVideoRequest{Id: req.VideoId}
 	_, err := s.videoClient.GetVideo(ctx, vreq)
 	if err != nil {
 		return nil, err
@@ -90,12 +90,12 @@ func (s *service) UpdateComment(ctx context.Context, req *pb.UpdateCommentReques
 		return nil, err
 	}
 	// Update(ctx context.Context, comment *Comment) error
-	comment := dao.Comment {ID:commentID, Content:req.GetContent()}
+	comment := dao.Comment{ID: commentID, Content: req.GetContent()}
 	err = s.commentDAO.Update(ctx, &comment)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.UpdateCommentResponse{Comment: comment.ToProto()},nil
+	return &pb.UpdateCommentResponse{Comment: comment.ToProto()}, nil
 }
 
 /*
@@ -111,9 +111,9 @@ func (s *service) DeleteComment(ctx context.Context, req *pb.DeleteCommentReques
 	// Delete(ctx context.Context, id uuid.UUID) error
 	err = s.commentDAO.Delete(ctx, commentID)
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
-	return &pb.DeleteCommentResponse{} ,nil
+	return &pb.DeleteCommentResponse{}, nil
 }
 
 /*
@@ -125,7 +125,7 @@ func (s *service) DeleteCommentByVideoID(ctx context.Context, req *pb.DeleteComm
 	// DeleteByVideoID(ctx context.Context, videoID string) error
 	err := s.commentDAO.DeleteByVideoID(ctx, req.GetVideoId())
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 	return &pb.DeleteCommentByVideoIDResponse{}, nil
 }
