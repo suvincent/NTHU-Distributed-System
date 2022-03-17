@@ -38,13 +38,15 @@ dc.generate:
 
 define make-generate-rules
 
-$1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/mockgen
+$1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/protoc-gen-grpc-sarama bin/mockgen
 	protoc \
 		-I . \
 		-I ./pkg/pb \
+		-I $(dir $(shell (go list -f '{{ .Dir }}' github.com/justin0u0/protoc-gen-grpc-sarama/proto))) \
 		--go_out=paths=source_relative:. \
 		--go-grpc_out=paths=source_relative:. \
 		--grpc-gateway_out=paths=source_relative:. \
+		--grpc-sarama_out=paths=source_relative:. \
 		./modules/$1/pb/*.proto
 
 	go generate ./modules/$1/...
@@ -52,7 +54,7 @@ $1.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gatewa
 endef
 $(foreach module,$(MODULES),$(eval $(call make-generate-rules,$(module))))
 
-pkg.generate:
+pkg.generate: bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpc-gateway bin/protoc-gen-grpc-sarama bin/mockgen
 	go generate ./pkg/...
 
 generate: pkg.generate $(addsuffix .generate,$(MODULES))
@@ -65,6 +67,9 @@ bin/protoc-gen-go-grpc: go.mod
 
 bin/protoc-gen-grpc-gateway: go.mod
 	go build -o $@ github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+
+bin/protoc-gen-grpc-sarama: go.mod
+	go build -o $@ github.com/justin0u0/protoc-gen-grpc-sarama
 
 bin/mockgen: go.mod
 	go build -o $@ github.com/golang/mock/mockgen
