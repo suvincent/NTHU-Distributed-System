@@ -4,6 +4,12 @@ The repository includes modules for the NTHU Distributed System course lab with 
 
 Before going through the following parts, make sure your Docker is running since we are generating/testing/building code inside a Docker container to prevent dependencies from conflicting/missing on your host machine.
 
+## lab result
+* prometheus result
+![](result1.png)
+
+* test result
+![](result2.png)
 ## Code Generation
 
 Some modules use gRPC for communication or use the `mockgen` library for unit testing.
